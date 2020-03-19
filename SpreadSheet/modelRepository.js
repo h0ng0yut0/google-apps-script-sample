@@ -1,5 +1,6 @@
 /**
  * SpreadSheetの情報を取得/編集する処理
+ * （※ 必要に応じて準備してください）
  */
 
 /**
@@ -43,14 +44,20 @@ function _modelRepository_resolveByRowNumber(sheet, rowNumber) {
  */
 function _modelRepository_storeAll(sheet, models) {
 
+  // 既存データをすべて消去
+  _truncateData(sheet)
+
   var startRow = 2 // 1行目がテーブルヘッダ
   var startCol = 1
   var numRows = models.length
   var lastCol = sheet.getLastColumn()
 
-  var updateSheetRange = sheet.getRange(startRow, startCol, numRows, lastCol)
-  var sheetRows = models.map(model => { return model.sheetRow })
-  updateSheetRange.setValues(sheetRows)
+  // 更新情報がない場合
+  if (numRows !== 0) {
+    var updateSheetRange = sheet.getRange(startRow, startCol, numRows, lastCol)
+    var sheetRows = models.map(model => { return model.sheetRow })
+    updateSheetRange.setValues(sheetRows)
+  }
 }
 
 /**
@@ -68,4 +75,24 @@ function _modelRepository_storeByRowNumber(sheet, rowNumber, model) {
   var sheetRows = [model.sheetRow]
   updateSheetRange.setValues(sheetRows)
 
+}
+
+/**
+ * シート情報をすべてクリアする
+ */
+function _truncateData(sheet) {
+
+  var startRow = 2 // 1行目がテーブルヘッダ
+  var startCol = 1
+
+  var lastRow = sheet.getLastRow()
+  var numRows = lastRow - 1 // 1行目がテーブルヘッダ
+
+  var lastCol = sheet.getLastColumn()
+
+  // まだ情報がない場合
+  if (numRows !== 0) {
+    var clearSheetRange = sheet.getRange(startRow, startCol, numRows, lastCol)
+    clearSheetRange.clearContent()
+  }
 }
